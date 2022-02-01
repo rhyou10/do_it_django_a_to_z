@@ -87,7 +87,7 @@
                     <!--bolg post-->
                     {% for p in post_list %}
                     <div class="card mb-4">
-                        <img class="card-img-top" src="https://dummyimage.com/750x350/dee2e6/6c757d.jpg" alt="Card image">
+                        <img class="card-img-top" src="{{p.head_image.url}}" alt="Card image">
                         <div class="card-body">
                             <h2 class="card-title">{{p.title}}</h2>
                             <p class="card-text">{{p.content}}</p>     
