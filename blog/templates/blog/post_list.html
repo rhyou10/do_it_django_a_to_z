@@ -84,10 +84,16 @@
             <div class = 'row'>
                 <div class = 'col-md-8 col-lg-6'>
                     <h1>Blog</h1>
-                    <!--bolg post-->
+                    <!--blog post-->
                     {% for p in post_list %}
                     <div class="card mb-4">
-                        <img class="card-img-top" src="{{p.head_image.url}}" alt="Card image">
+                        <!-- 블로그 대표이미지 없을때 alt로 이미지 다른이미지로 변경 -->
+                        {% if p.head_image %}
+                        <img class="card-img-top" src="{{p.head_image.url}}" alt="{{p}} head_image">
+                        {% else %}
+                            <!-- head_image 없을경우 https://picsum.photos/800/200 랜덤이미지 가지고온다. -->
+                            <img class = 'card-img-top' src='https://picsum.photos/seed/{{p.id}}/800/200' alt="random_image">
+                        {% endif %}
                         <div class="card-body">
                             <h2 class="card-title">{{p.title}}</h2>
                             <p class="card-text">{{p.content}}</p>     
