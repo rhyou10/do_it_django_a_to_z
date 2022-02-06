@@ -17,8 +17,11 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    #author foeignkey로 만들어지고 User가 사라질때 model들도 같이 사라진다.
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    #author foeignkey로 만들어지고  CASCADE는 User가 사라질때 model들도 같이 사라진다. 게시물도 같이 사라진다.
+    # SET_NULL 의 경우 user가 사라져도 model은 나아있게된다. 대신 user 명이 null값이 된다.
+    #author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
 
     def __str__(self):
         return f"[{self.pk}]{self.title} :: {self.author}"
