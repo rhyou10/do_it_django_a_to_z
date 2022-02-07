@@ -6,7 +6,7 @@
 {% if post_list %}
 <!--blog post-->
 {% for p in post_list %}
-<div class="card mb-4">
+<div class="card mb-4" id = "post-{{p.pk}}">
     <!-- 블로그 대표이미지 없을때 alt로 이미지 다른이미지로 변경 -->
     {% if p.head_image %}
     <img class="card-img-top" src="{{p.head_image.url}}" alt="{{p}} head_image">
@@ -15,6 +15,12 @@
         <img class = 'card-img-top' src='https://picsum.photos/seed/{{p.id}}/800/200' alt="random_image">
     {% endif %}
     <div class="card-body">
+        <!-- category 뱃지-->
+        {% if p.category %}
+            <span class = "badge badge-secondary float-right">{{p.category}}</span>
+        {% else %}
+            <span class = "badge badge-secondary float-right">미분류</span>
+        {% endif %}
         <h2 class="card-title">{{p.title}}</h2>
         <!-- hook_text text-muted는 글자 회색으로 -->
         {% if p.hook_text %}

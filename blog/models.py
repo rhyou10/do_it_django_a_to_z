@@ -5,6 +5,17 @@ from django.contrib.auth.models import User
 import os
 
 #게시물에 대한 모델
+
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
+    class Meta: ## 모델 이름변경 복수형으로 바꿀때
+        verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return self.name
+        
 class Post(models.Model):
     title = models.CharField(max_length=30)
     #hook_text content 요약 자극적으로 적기
@@ -22,6 +33,9 @@ class Post(models.Model):
     #author = models.ForeignKey(User, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
+    # blank =True 카테고리 비어있어도 오류 안나도록
+    category = models.ForeignKey(Category, null=True, on_delete= models.SET_NULL, blank=True)
+
 
     def __str__(self):
         return f"[{self.pk}]{self.title} :: {self.author}"
@@ -34,4 +48,7 @@ class Post(models.Model):
 
     def get_file_ext(self):
         return self.get_file_name().split('.')[-1] 
+
+
+
 # Create your models here.
