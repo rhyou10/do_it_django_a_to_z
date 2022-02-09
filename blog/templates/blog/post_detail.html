@@ -34,6 +34,14 @@
     <section class="mb-5">
         <p class="fs-5 mb-4">{{post.content}}</p>
     </section>
+    {% if post.tags.exists %}
+        <i class = 'fas fa-tags'></i>
+        {% for tag in post.tags.iterator %}
+            <a href='{{tag.get_absolute_url}}'><span class="badge badge-pill badge-light">{{ tag }}</span></a>
+        {% endfor %}
+    {% endif %}
+        </br>
+        </br>   
     <!-- Post file download -->
     <!-- 포스트에 file이 있는경우 다운로드할수있는 btn 만든다. -->
     {% if post.file_upload %}
@@ -50,6 +58,8 @@
             {{post.get_file_name}}
         </a>
     {% endif %}
+    </br>
+    </br>
 </div>
 </article>
 <!-- Comments section-->

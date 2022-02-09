@@ -1,11 +1,12 @@
 from distutils.command.upload import upload
+from hashlib import blake2b
 from turtle import Turtle
 from django.db import models
 from django.contrib.auth.models import User
 import os
 
-#게시물에 대한 모델
 
+## 게시물의 다대일 관계로 연결된 Category 모델
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
@@ -19,6 +20,19 @@ class Category(models.Model):
     def get_absolute_url(self):
         return f"/blog/category/{self.slug}/"
         
+## 게시물과 다대다 관계로 연결된 tag 모댈
+class Tag(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
+    def __str__(self) :
+        return self.name
+
+    def get_absolute_url(self):
+        return f'/blog/tag/{self.slug}/'
+
+
+#게시물에 대한 모델
 class Post(models.Model):
     title = models.CharField(max_length=30)
     #hook_text content 요약 자극적으로 적기
@@ -38,6 +52,10 @@ class Post(models.Model):
 
     # blank =True 카테고리 비어있어도 오류 안나도록
     category = models.ForeignKey(Category, null=True, on_delete= models.SET_NULL, blank=True)
+
+    # Tag 다대다 연결
+    # WARNINGS : blog.Post.tag: (fields.W340) null has no effect on ManyToManyField. 이기 떄문에 null=True 삭제
+    tags = models.ManyToManyField(Tag, blank=True)
 
 
     def __str__(self):

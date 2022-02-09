@@ -4,7 +4,7 @@ from urllib import response
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 # Create your tests here.
 
@@ -16,12 +16,17 @@ class TestView(TestCase):
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_music = Category.objects.create(name="music", slug="music")
 
+        self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
+        self.tag_python = Tag.objects.create(name='python', slug='python')
+        self.tag_hello = Tag.objects.create(name='hello', slug='hello')
+
         self.post_001 = Post.objects.create(
             title='1번',
             content = 'hello world',
             author = self.user_trump,
             category = self.category_programming,
         )
+        self.post_001.tags.add(self.tag_hello)
 
         self.post_002 = Post.objects.create(
             title='2번',
@@ -35,6 +40,8 @@ class TestView(TestCase):
             content = 'no category',
             author = self.user_trump,
         )
+        self.post_003.tags.add(self.tag_python_kor)
+        self.post_003.tags.add(self.tag_python)
 
     ## 카테고리 페이지 테스트
     def test_category_page(self):
@@ -90,6 +97,8 @@ class TestView(TestCase):
         # category 없는경우
         self.assertIn(f'미분류 (1)', category_card.text)
     
+
+    # 포스트 리스트 테스트
     def test_post_list(self):
         # 포스트가 있는경우
         self.assertEqual(Post.objects.count(), 3)
@@ -114,17 +123,27 @@ class TestView(TestCase):
         #2.2 '아직 게시물이 없습니다' 라는 문구가 보인다.
         main_area = soup.find('div', id='main-area')
 
+        #post_001_card는 post pk 1번게시물을 찾아 놓은것
         post_001_card = main_area.find('div', id = 'post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
+        self.assertIn(self.tag_hello.name, post_001_card.text)
+        self.assertNotIn(self.tag_python.name, post_001_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_001_card.text)
         
         post_002_card = main_area.find('div', id = 'post-2')
         self.assertIn(self.post_002.title, post_002_card.text)
         self.assertIn(self.post_002.category.name, post_002_card.text)
+        self.assertNotIn(self.tag_hello.name, post_002_card.text)
+        self.assertNotIn(self.tag_python.name, post_002_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_002_card.text)
 
         post_003_card = main_area.find('div', id = 'post-3')
         self.assertIn(self.post_003.title, post_003_card.text)
         self.assertIn('미분류', post_003_card.text)
+        self.assertNotIn(self.tag_hello.name, post_003_card.text)
+        self.assertIn(self.tag_python.name, post_003_card.text)
+        self.assertIn(self.tag_python_kor.name, post_003_card.text)
 
 
         #3.2 포스트 목록 페이지를 새로고침 했을 때
