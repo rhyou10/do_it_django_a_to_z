@@ -2,7 +2,13 @@
 
 {% block main_area %}
 
-<h1>Blog{% if category %}<span class="badge bg-secondary">{{category}}</span>{% endif %}</h1>
+<h1>Blog{% if category %}
+    <span class="badge bg-secondary">{{category}}        
+    </span>{% endif %}
+    {% if tag %}
+    <span class="badge bg-light"><i class="fas fa-tags"></i>{{tag}}        
+    </span>{% endif %}
+</h1>
 {% if post_list %}
 <!--blog post-->
 {% for p in post_list %}
