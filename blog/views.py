@@ -2,7 +2,7 @@ from re import template
 from urllib import request
 from django.shortcuts import render
 from .models import Post, Category, Tag
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
 
 ## CBV 클래스 기반 view
 
@@ -62,6 +62,10 @@ def tag_page(request, slug):
         }
     )
 
+#포스트 생성 뷰
+class PostCreate(CreateView):
+    model = Post
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
 """
 #FBV(Fuction base view) 함수기반

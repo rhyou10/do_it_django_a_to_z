@@ -222,3 +222,12 @@ class TestView(TestCase):
         self.assertIn(self.user_trump.username.upper(), main_area.text.upper())
         self.assertIn(self.post_001.content, post_area.text)
 
+## 포스트 생성 페이지
+    def test_create_post(self):
+        response = self.client.get('/blog/create_post/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.context, 'html.parser')
+
+        self.assertEqual('Creat Post - Blog', soup.title.text)
+        main_area = soup.find('div', id = 'main-area')
+        self.assertIn('Creat New Post', main_area.text)
