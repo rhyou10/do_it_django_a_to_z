@@ -3,9 +3,9 @@
 {% block head_title %}Creat Post - Blog{% endblock %}
 
 {% block main_area %}
-    <h1>Creat New Post</h1>
+    <h1>Create New Post</h1>
     <hr/>
-    <form method = "post" enctype="multipart/form-data">{% csrf_token %}</form>
+    <form method = "post" enctype="multipart/form-data">{% csrf_token %}
         <table>
             {{form}}
         </table>
