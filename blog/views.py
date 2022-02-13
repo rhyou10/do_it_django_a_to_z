@@ -1,6 +1,6 @@
 from re import template
 from urllib import request
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -68,6 +68,16 @@ def tag_page(request, slug):
 class PostCreate(LoginRequiredMixin,CreateView):
     model = Post
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
+
+    # author 채우기 
+    def form_valid(self, form):
+        current_user = self.request.user
+
+        if current_user.is_authenticated: # is_authenticated 사용자의 로그인 유무
+            form.instance.author = current_user
+            return super(PostCreate, self).form_valid(form)
+        else:
+            return redirect('/blog/')
 
 """
 #FBV(Fuction base view) 함수기반
