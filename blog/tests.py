@@ -13,6 +13,11 @@ class TestView(TestCase):
         self.client = Client()
         self.user_trump = User.objects.create_user(username='trump', password='somepassword')
         self.user_obama = User.objects.create_user(username='obama', password='somepassword')
+
+        # user_obama 스태프 권한 부여
+        self.user_obama.is_staff = True
+        self.user_obama.save()
+
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_music = Category.objects.create(name="music", slug="music")
 
@@ -27,6 +32,7 @@ class TestView(TestCase):
             category = self.category_programming,
         )
         self.post_001.tags.add(self.tag_hello)
+
 
         self.post_002 = Post.objects.create(
             title='2번',
@@ -228,10 +234,17 @@ class TestView(TestCase):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
+        #트럼프 is_staff=false라 포스트 생성 불가 notequal
         self.client.login(username='trump', password='somepassword')
-        
         response = self.client.get('/blog/create_post/')
-        self.assertEqual(response.status_code, 200)## 왜 200이 안나올까???
+        self.assertNotEqual(response.status_code, 200)
+
+        # staff인 오바마로 로그인
+        self.client.login(username='obama', password = 'somepassword')
+        response = self.client.get('/blog/create_post/')
+        self.assertEqual(response.status_code, 200)
+
+
         soup = BeautifulSoup(response.content, 'html.parser')
 
 
@@ -251,4 +264,4 @@ class TestView(TestCase):
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, 'post 만들기')
         self.assertEqual(last_post.content, 'post form test')
-        self.assertEqual(last_post.author.username, 'trump')
+        self.assertEqual(last_post.author.username, 'obama')
