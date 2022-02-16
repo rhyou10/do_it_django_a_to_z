@@ -2,8 +2,9 @@ from re import template
 from urllib import request
 from django.shortcuts import redirect, render
 from .models import Post, Category, Tag
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 
 ## CBV 클래스 기반 view
 
@@ -70,7 +71,7 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin , CreateView):
     model = Post
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
-    def test_func(self):
+    def test_func(self): #사용자 인증함수? 사용자가 주어진 테스트를 통과했는지 확인하는 기능
         return self.request.user.is_superuser or self.request.user.is_staff
     # author 채우기 
     def form_valid(self, form):
@@ -81,6 +82,17 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin , CreateView):
             return super(PostCreate, self).form_valid(form)
         else:
             return redirect('/blog/')
+
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags']
+    template_name = 'blog/post_update_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
 
 """
 #FBV(Fuction base view) 함수기반

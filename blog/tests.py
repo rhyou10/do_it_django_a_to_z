@@ -37,14 +37,14 @@ class TestView(TestCase):
         self.post_002 = Post.objects.create(
             title='2번',
             content = '1등이 전부는 아니자나',
-            author = self.user_obama,
+            author = self.user_trump,
             category = self.category_music,
         )
 
         self.post_003 = Post.objects.create(
             title='3번',
             content = 'no category',
-            author = self.user_trump,
+            author = self.user_obama,
         )
         self.post_003.tags.add(self.tag_python_kor)
         self.post_003.tags.add(self.tag_python)
@@ -265,3 +265,54 @@ class TestView(TestCase):
         self.assertEqual(last_post.title, 'post 만들기')
         self.assertEqual(last_post.content, 'post form test')
         self.assertEqual(last_post.author.username, 'obama')
+    
+
+    # 포스트 수정 test  
+    def test_update_post(self):
+        update_post_url = f'/blog/update_post/{self.post_003.pk}/'
+
+        # 로그인 안함
+        response = self.client.get(update_post_url)
+        self.assertNotEqual(response.status_code, 200)
+
+        # 로그인 했는데 작성자 아닌 경우
+        self.assertNotEqual(self.post_003.author, self.user_trump)
+        self.client.login(
+            username = self.user_trump,
+            password = 'somepassword',
+        )
+
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 403)
+
+
+        #작성자가 obama
+        self.client.login(
+            username = self.user_obama,
+            password = 'somepassword',
+        )
+
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertIn('Edit Post - Blog', soup.title.text)
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Edit Post', main_area.text)
+
+        response = self.client.post(
+            update_post_url,
+            {
+                'title' : '세번째 포스트 수정',
+                'content' : '안녕',
+                'category' : self.category_music.pk,
+            },
+            follow=True
+        )
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        main_area = soup.find('div', id = 'main-area')
+        self.assertIn('세번째 포스트 수정', main_area.text)
+        self.assertIn('안녕', main_area.text)
+        self.assertIn(self.category_music.name, main_area.text)
+        
