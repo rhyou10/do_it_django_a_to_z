@@ -252,11 +252,15 @@ class TestView(TestCase):
         main_area = soup.find('div', id = 'main-area')
         self.assertIn('Create New Post', main_area.text)
 
+        tags_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tags_str_input)
+
         self.client.post(
             '/blog/create_post/',
             {
                 'title' : 'post 만들기',
                 'content' : "post form test",
+                'tags_str' : 'new tag; 한글태그, python'
             }
         )
 
@@ -265,6 +269,11 @@ class TestView(TestCase):
         self.assertEqual(last_post.title, 'post 만들기')
         self.assertEqual(last_post.content, 'post form test')
         self.assertEqual(last_post.author.username, 'obama')
+
+        self.assertEqual(last_post.tags.count(), 3)
+        self.assertTrue(Tag.objects.get(name='new tag'))
+        self.assertTrue(Tag.objects.get(name='한글태그'))
+        self.assertEqual(Tag.objects.count(), 5)
     
 
     # 포스트 수정 test  

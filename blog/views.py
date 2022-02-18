@@ -1,10 +1,12 @@
 from re import template
-from urllib import request
+from urllib import request, response
 from django.shortcuts import redirect, render
 from .models import Post, Category, Tag
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+
+from django.utils.text import slugify #이 값을 name로 갖는 태그가 있다면 가져오고 없다면 새로만들게 한다.
 
 ## CBV 클래스 기반 view
 
@@ -79,7 +81,23 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin , CreateView):
 
         if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser): # is_authenticated 사용자의 로그인 유무
             form.instance.author = current_user
-            return super(PostCreate, self).form_valid(form)
+
+            response = super(PostCreate, self).form_valid(form)
+
+            tags_str = self.request.POST.get('tags_str')
+            if tags_str:
+                tags_str = tags_str.strip()
+                tags_str = tags_str.replace(',', ';')
+                tags_list = tags_str.split(';')
+
+                for t in tags_list:
+                    t = t.strip()
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                    if is_tag_created:
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save()
+                    self.object.tags.add(tag)
+            return response
         else:
             return redirect('/blog/')
 
