@@ -5,6 +5,7 @@ from .models import Post, Category, Tag, Comment
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from .forms import CommentForm 
 
 from django.utils.text import slugify #이 값을 name로 갖는 태그가 있다면 가져오고 없다면 새로만들게 한다.
 
@@ -31,6 +32,7 @@ class PostDetail(DetailView):
         context = super(PostDetail, self).get_context_data()
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        context['comment_form'] = CommentForm
         return context
 
 def category_page(request, slug):

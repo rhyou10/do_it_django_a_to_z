@@ -348,4 +348,54 @@ class TestView(TestCase):
         self.assertTrue('한글태그', main_area.text)
         self.assertTrue('some tag', main_area.text)
         self.assertNotIn('python', main_area.text)
+
+    # comment test
+    def test_comment_form(self):
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(self.post_001.comment_set.count(),1)
+
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertIn('Login and leave a comment!', comment_area.text)
         
+        #로그인하지 않은상태에서는 form 안보여야한다(작성불가)
+        self.assertFalse(comment_area.find('form', id='comment_form')) 
+
+        #로그인하기
+        self.client.login(username='obama', password='somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertTrue(comment_area.find('form', id='comment-form')) 
+        self.assertNotIn('Login and leave a comment!', comment_area.text)
+
+        comment_form = comment_area.find('form', id='comment-form')
+        self.assertTrue(comment_form.find('textarea',id='id_content'))
+
+        response = self.client.post(
+            self.post_001.get_absoulte_url() + 'new_comment/',
+            {
+                'content' : '오바마의 첫댓글'
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Comment.objects.count(),2)
+        self.assertEqual(self.post_001.commnet_set.count(),2)
+
+        new_comment = Comment.objects.last()
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(new_comment.post.title, soup.title.text)
+
+        comment_area = soup.find('div', id='comment-area')
+        new_comment_div = comment_area.find('div', id=f'comment-{new_comment.pk}')
+        self.assertIn('obama', new_comment_div.text)
+        self.assertIn('오바마의 첫댓글', new_comment_div.text)
