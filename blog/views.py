@@ -1,11 +1,13 @@
 from re import template
 from urllib import request, response
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from .models import Post, Category, Tag, Comment
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from .forms import CommentForm 
+
+from django.shortcuts import get_list_or_404
 
 from django.utils.text import slugify #이 값을 name로 갖는 태그가 있다면 가져오고 없다면 새로만들게 한다.
 
@@ -142,6 +144,23 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
                 self.object.tags.add(tag)
             return response
 
+def new_comment(request, pk):
+    if request.user.is_authenticated:
+        post = get_object_or_404(Post, pk=pk)# pk가 없는경우 에러발생을 위해
+        #Post.objects.get(pk=pk)
+
+        if request.method == "POST":
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = post
+                comment.author = request.user
+                comment.save()
+                return redirect(comment.get_absolute_url())
+        else:
+            return redirect(post.get_absolute_url())
+    else:
+        raise PermissionDenied
 """
 #FBV(Fuction base view) 함수기반
 def index(request):
