@@ -100,7 +100,7 @@
                             <div class="media-body">
                                 <!-- 수정 버튼-->
                                 {% if user.is_authenticated and comment.author == user %}
-                                    <a role "button"
+                                    <a role="button"
                                     class='btn btn-sm btn-info float-right'
                                     id="comment-{{comment.pk}} updatebtn"
                                     href="/blog/update_comment/{{comment.pk}}/">
@@ -109,6 +109,9 @@
                                 {% endif %}
                                 <div class="fw-bold">{{comment.author.username}} &nbsp;&nbsp; <small class="text-muted">{{comment.create_at}}</small></div>
                                 <p>{{comment.content | linebreaks}}</p>
+                                {% if comment.created_at != comment.modified_at %}
+                                    <p class='text-muted float-right'><small>Updated: {{comment.modified_at}}</small></p>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}

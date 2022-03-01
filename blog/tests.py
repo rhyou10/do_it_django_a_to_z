@@ -378,7 +378,7 @@ class TestView(TestCase):
         self.assertTrue(comment_form.find('textarea',id='id_content'))
 
         response = self.client.post(
-            self.post_001.get_absoulte_url() + 'new_comment/',
+            self.post_001.get_absolute_url() + 'new_comment/',
             {
                 'content' : '오바마의 첫댓글'
             },
@@ -388,7 +388,7 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(Comment.objects.count(),2)
-        self.assertEqual(self.post_001.commnet_set.count(),2)
+        self.assertEqual(self.post_001.comment_set.count(),2)
 
         new_comment = Comment.objects.last()
 
@@ -425,10 +425,29 @@ class TestView(TestCase):
         self.assertFalse(comment_area.find('a', id='comment-2 updatebtn'))
         comment_001_update_btn = comment_area.find('a', id='comment-1 updatebtn')
         self.assertIn('edit', comment_001_update_btn.text)
-        self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1')
+        self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
 
         response = self.client.get('/blog/update_comment/1/')
         self.assertEqual(response.status_code, 200)
-        soup = BeautifulSoup(response.content.text, 'html.parser')
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Edit Comment - Blog', soup.title.text)
+        update_comment_form = soup.find('form', id='comment-form')
+        content_textarea = update_comment_form.find('textarea', id='id_content')
+        self.assertIn(self.comment_001.content, content_textarea.text)
+
+        response = self.client.post(
+            f'/blog/update_comment/{self.comment_001.pk}/',
+            {
+                'content' : '오바마의 댓글을 수정합니다.'
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code,200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        comment_001_div = soup.find('div', id='comment-1')
+        self.assertIn('오바마의 댓글을 수정합니다.', comment_001_div.text)
+        self.assertIn('Updated: ', comment_001_div.text)
 
 
