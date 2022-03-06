@@ -18,6 +18,9 @@ class PostList(ListView):
     ordering = '-pk'
     #template_name = 'blog/index.html'
 
+    paginate_by = 5 ## 페이지당 표시할 post
+    
+
     def get_context_data(self, **kwargs):
         context = super(PostList, self).get_context_data()
         context['categories'] = Category.objects.all()
