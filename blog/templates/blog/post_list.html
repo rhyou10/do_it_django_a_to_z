@@ -7,7 +7,9 @@
         {% endif %}
     {% endif %}
 
-<h1>Blog{% if category %}
+<h1>Blog
+    {% if search_info %}<samll class = 'text-muted'>{{search_info}}</samll>{%endif%}
+    {% if category %}
     <span class="badge bg-secondary">{{category}}        
     </span>{% endif %}
     {% if tag %}

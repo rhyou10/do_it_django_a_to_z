@@ -4,6 +4,7 @@ from urllib import response
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
+from pip import main
 from .models import Post, Category, Tag, Comment
 
 # Create your tests here.
@@ -512,7 +513,7 @@ class TestView(TestCase):
         post_about_python = Post.objects.create(
             title = "파이썬에 대한 포스트 입니다.",
             content = "Hello World. We are the world.",
-            autho = self.user_trump
+            author = self.user_trump
         )
 
         response = self.client.get('/blog/search/파이썬/')
@@ -521,4 +522,8 @@ class TestView(TestCase):
 
         main_area = soup.find('div', id='main-area')
 
-        self.
+        self.assertIn('Search: 파이썬 (2)', main_area.text)
+        self.assertNotIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertIn(self.post_003.title, main_area.text)
+        self.assertIn(post_about_python.title, main_area.text)
