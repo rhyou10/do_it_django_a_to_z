@@ -1,20 +1,64 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang = "ko">
     <head>
         <meta charset="UTF-8">
         <title>개발자 유태혁입니다..</title>
+
+        <link rel = "stylesheet" href ="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
+        <script src="https://kit.fontawesome.com/ce2f581f50.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="{% static 'single_pages/css/about_me.css' %}" media="screen">
+
     </head>
     
     <body>
-        <nav>
-            <a href = "/blog">Blog</a>
-            <a href = "/about_me">About_me</a>
-        </nav>
+        {% include 'blog/navbar.html' %}
 
-        <h1>안녕하세요 유태혁입니다.</h1>
-        <h2>이력</h2>
-        <h2>Portfolio</h2>
-        <h3>아직 작업중입니다.</h3>
+        <section>
+            <div class="container mb-4">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h1>안녕하세요 유태혁입니다.</h1>
+
+                        <br/>
+                        <p class='lead'>
+                            컴퓨터와 음악을 좋아합니다.<br/>
+                            다시한번 프로그래머가 되기위해 도전하고 있습니다.
+                        </p>
+
+                        <ul>
+                            <li>WORK EXPEIENCE</li>
+                            <ul>
+                                <li>회사 - 경력</li>
+                            </ul>
+                            <li>EDUCATION</li>
+                            <ul>
+                                <li>교육경력</li>
+                            </ul>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4">
+                        <img class='img-fluid' src="{% static 'single_pages/images/my_picture.jpg' %}">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class = 'bg-light margin-for-footer'>
+            <div class='container'>
+                <div class='row'>
+                    <div class='col-12'>
+                        <h1>PORTFOLIO</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <div class="fixed-bottom">
+            {% include 'blog/footer.html' %}
+        </div>
     </body>
 </html>
 <head>
