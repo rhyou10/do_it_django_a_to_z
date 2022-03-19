@@ -10,6 +10,7 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apk update
 RUN apk add postgresql-dev gcc python3-dev musl-dev zlib-dev jpeg-dev
+RUN apk add tk
 
 COPY . /usr/src/app/
 
