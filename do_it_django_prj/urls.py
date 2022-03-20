@@ -29,3 +29,5 @@ urlpatterns = [
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
 #url 사진 찾는 용도
+
+urlpatterns += static(settings.STATIC_URL, documnet_root=settings.STATIC_ROOT)
